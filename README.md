@@ -1,85 +1,65 @@
 # CivicBin AI ♻️🤖
 
-**AI-assisted waste management for cleaner, smarter communities.**
+**See the Waste. Understand the Event. Trigger Action.**
 
-CivicBin AI explores how open-model AI—using **Gemma 4**—can support practical waste-management and civic-cleanliness workflows. The project began with a real-world problem and has also been shaped by thinking about how to explain the solution to a potential first customer and prepare it for real-world use.
+CivicBin AI is an AI-assisted civic-cleanliness project exploring how **Gemma 4 multimodal vision AI** can help interpret waste-disposal events in authorized CCTV or video footage. The core use case is not only checking whether a bin is full: it is flagging a possible **missed disposal**—when waste may miss a bin—and preparing evidence for a human reviewer.
 
-> **Project status:** The project concept and AI-assisted application work have been developed. This repository is being organized to document the work clearly. Detailed implementation files, reproducible setup instructions, and verified demo/test evidence should be added as they are ready. The feature descriptions below distinguish the goal from functionality that has been independently documented in this repository.
+## 🎯 The Problem
 
-## 🌍 The Problem
+CCTV footage records what happens, but people may still need to review long recordings manually to understand a specific waste-disposal event. A bin can be far from full while litter remains on the ground. CivicBin AI explores an event-focused workflow for these situations.
 
-Waste-management issues can be difficult to report, understand, and follow up on consistently. CivicBin AI explores how an AI-assisted workflow could help make civic waste issues easier to interpret and manage.
+## 🧠 How CivicBin AI Works
 
-## 💡 The Approach
+The intended workflow is:
 
-The project uses **Gemma 4** as the open-model AI foundation explored during development. The broader direction is to connect AI-assisted understanding with a practical workflow for civic waste management.
+1. **Video input:** use authorized CCTV footage or a short sample clip.
+2. **Frame selection:** extract relevant frames from the disposal event.
+3. **Gemma 4 vision analysis:** interpret the selected visual context.
+4. **Civic Waste Investigator:** validate the evidence and classify the candidate event.
+5. **Structured incident:** record the possible incident, supporting evidence, uncertainty, and suggested next step.
+6. **Human review:** a person verifies the evidence before any real-world action.
 
-The intended workflow may include:
-1. Providing relevant waste-related input, such as an image or video frame, where supported by the implementation.
-2. Using an AI model to help interpret the input.
-3. Structuring useful information for review.
-4. Presenting the result in a way that could help people assess and follow up on an issue.
+Possible review outcomes include correct disposal, missed disposal/littering, bin overflow, and unclear footage requiring review. These are the intended classification categories; measured performance has not been published in this repository.
 
-These are project goals, not a claim that every step is currently implemented or production-ready.
+## 🛠️ Technology Direction
 
-## 🎯 What We Have Worked On
+- **AI model:** Gemma 4 multimodal vision
+- **Model runtime path:** Ollama (compatibility and exact model variant should be verified against the runnable setup)
+- **Video/frame processing:** Python and OpenCV
+- **Agent rules:** Civic Waste Investigator Agent Skill
+- **Incident representation:** structured JSON
+- **Version control:** Git and GitHub
 
-- Identifying waste management and civic cleanliness as a practical problem to address.
-- Exploring the use of Gemma 4 in an AI-powered solution.
-- Developing the project direction and application workflow.
-- Thinking about how to communicate the product's value to a potential first customer.
-- Considering what is needed to move from a prototype toward practical use and shipping.
+The repository currently documents the project workflow and agent rules. The complete runnable application, exact dependency versions, model configuration, and reproducible test evidence still need to be committed before another developer can reproduce the full demo from this repository alone.
 
-## 🧠 Why Gemma 4?
+## 📂 Repository Contents
 
-Open models make it possible to explore AI capabilities and build application-specific workflows. Gemma 4 is the model used in our project exploration. Exact model variant, runtime configuration, and reproducible inference steps will be documented alongside the implementation files.
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — system workflow, design principles, and implementation status.
+- [docs/GEMMA4_WORKFLOW.md](docs/GEMMA4_WORKFLOW.md) — Gemma 4 vision workflow and validation plan.
+- [skills/civic-waste-investigator/SKILL.md](skills/civic-waste-investigator/SKILL.md) — agent instructions for evidence-led incident review.
 
-## 🧪 Testing and Demo
+## 🚧 Current Project Status
 
-A reproducible demo and test results will be linked here when the relevant files and evidence are included in this repository. Until then, no benchmark, accuracy figure, customer deployment, or production-readiness claim is made.
+Work completed so far includes defining the missed-disposal problem, shaping the Gemma 4-based workflow, designing the Civic Waste Investigator agent rules, and preparing the project for a potential customer pitch and practical delivery.
 
-- **Repository:** https://github.com/prabhtheone/CivicBin-AI
-- **Demo:** To be added when a stable, shareable demo is available.
-- **Test results:** To be documented with reproducible examples.
+This repository is being filled with the project artifacts available so far. It does **not** claim a verified accuracy score, a confirmed sale, a customer deployment, or city-wide production readiness. Add source code, exact runtime details, actual outputs, and test results as they become available.
 
-## 🛠️ Setup
+## 🧪 Validation Plan
 
-The repository currently provides this project overview. A complete setup guide depends on adding the actual source code or notebook and its verified dependencies.
+Before relying on incident flags, evaluate the system on authorized, labeled sample clips. Record the expected event, model output, supporting frames, false positives, false negatives, uncertain cases, and processing time. Do not treat illustrative examples as measured results.
 
-Once those files are committed, this section should include:
-- Supported Python version and environment setup
-- Exact dependencies
-- Model/runtime configuration
-- Commands to run the application
-- A sample input and expected output
+## 🔐 Privacy and Human Oversight
 
-Please do not assume that commands or dependencies are available until they are documented with the implementation.
-
-## 🗺️ Roadmap
-
-- [ ] Add the project notebook/source files and document the implemented workflow.
-- [ ] Record the exact Gemma 4 variant and runtime configuration.
-- [ ] Add reproducible sample inputs and outputs.
-- [ ] Document tests and known limitations.
-- [ ] Add screenshots or a short demo.
-- [ ] Improve usability and evaluate the workflow with real users.
-- [ ] Document deployment steps once a stable deployment is available.
-
-## 🤝 Product Thinking
-
-CivicBin AI is being developed with a product mindset: identify a real problem, build a useful solution, communicate its value to a potential customer, and keep improving toward practical delivery. The customer-pitch experience is part of the learning journey; it should not be interpreted as a confirmed sale or deployment.
-
-## 🔐 Responsible Use
-
-- Review AI-generated results before acting on them.
-- Do not upload private, sensitive, or identifying footage without appropriate permission.
-- Treat model outputs as assistance, not as definitive evidence.
-- Document limitations and validate the system in the intended environment before real-world use.
+- Process only footage the operator is authorized to use.
+- Do not perform face recognition or identity profiling.
+- Minimize stored footage and restrict access to evidence.
+- Treat model output as a candidate observation, not a verdict.
+- Require human review before any cleanup, escalation, or other action.
 
 ## 👤 Author
 
-Created by **[prabhtheone](https://github.com/prabhtheone)**.
+Created by [prabhtheone](https://github.com/prabhtheone).
 
 ---
 
-*Built around a simple idea: use AI thoughtfully to help solve problems that matter in everyday life.*
+*An AI-assisted approach to turning CCTV footage into reviewable civic intelligence.*
