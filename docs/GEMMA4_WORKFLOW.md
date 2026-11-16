@@ -1,60 +1,64 @@
-# Gemma 4 Vision Workflow
+# Gemma 4 vision workflow
 
-This document captures the intended CivicBin AI workflow around Gemma 4. It is technical project documentation, not a benchmark report.
+This is a proposed workflow for the CivicBin AI vision-model component. It is a design note, not an implemented integration or benchmark.
 
-## Core use case
+## Use case
 
-Flag a possible missed waste-disposal event in authorized CCTV footage, even when the bin is not full. The system should help a human reviewer understand what happened, not identify or punish a person.
+Review a possible missed waste-disposal event in authorized video footage. The system should describe the visible evidence and uncertainty. It should not identify or profile people.
 
-## Processing stages
+## Processing steps
 
-1. **Input:** an authorized short clip or sample video.
-2. **Frame extraction:** use Python/OpenCV to select frames around a possible disposal attempt.
-3. **Multimodal analysis:** pass the selected visual context to a compatible Gemma 4 vision model through the chosen runtime (Ollama is the current runtime path to verify).
-4. **Event interpretation:** ask the model to distinguish what is visible from what is uncertain. A single frame may not prove whether waste entered the bin.
-5. **Agent validation:** apply the Civic Waste Investigator rules in `../skills/civic-waste-investigator/SKILL.md`.
-6. **Human review:** show the proposed classification and evidence frames to a reviewer before any action.
+1. **Input:** provide a short video clip that the operator is authorized to process.
+2. **Frame selection:** use the planned Python/OpenCV stage to extract frames around the event.
+3. **Vision analysis:** send selected frames and relevant context to a compatible Gemma 4 vision model. The model runtime and exact model variant still need to be selected and tested.
+4. **Evidence check:** separate what is directly visible from what is inferred. A single frame may not show whether an item entered the bin.
+5. **Review rules:** apply the [Civic Waste Investigator skill](../skills/civic-waste-investigator/SKILL.md).
+6. **Human review:** show the proposed outcome and supporting frames to a person before any action.
 
-## Candidate outcomes
+## Proposed event labels
 
-- `CORRECT_DISPOSAL` — evidence supports that waste entered the bin.
-- `MISSED_DISPOSAL` — evidence supports that waste missed the bin or was left outside.
-- `BIN_OVERFLOW` — visible waste appears to exceed the bin's capacity.
-- `UNCERTAIN` — evidence is insufficient, contradictory, or obstructed.
+- `CORRECT_DISPOSAL`
+- `MISSED_DISPOSAL`
+- `BIN_OVERFLOW`
+- `UNCERTAIN`
 
-These are proposed labels. Their definitions and model behaviour must be tested against labeled examples before they are treated as reliable.
+Use `UNCERTAIN` when the selected frames do not clearly support one of the other labels. The label definitions and model behaviour must be checked against human-labeled examples.
 
-## Suggested output format
+## Example output shape
 
 ```json
 {
   "event_type": "UNCERTAIN",
-  "summary": "Insufficient visual evidence to determine the disposal outcome.",
+  "summary": "The available frames do not show the disposal outcome clearly.",
   "evidence_frames": [],
   "confidence": null,
-  "uncertainty_reason": "The relevant disposal outcome is not clearly visible.",
+  "uncertainty_reason": "The relevant moment is not visible in the selected frames.",
   "human_review_required": true
 }
 ```
 
-This is an illustrative schema example, not a recorded model result. Confidence should only be populated if the implementation defines and validates what that number means; model-generated confidence is not automatically calibrated.
+This is an illustrative example, not an output recorded from a model run. Do not fill in a confidence value unless the implementation defines what it measures and validates that measure. A model-generated confidence value is not automatically calibrated.
 
-## Runtime details to record
+## Details to record when the integration exists
 
-- Exact Gemma 4 model identifier and variant
-- Ollama/runtime version and model settings
-- Python version and package versions
-- GPU/CPU configuration and memory use
-- Actual input clip, selected frame timestamps, and raw model response
-- Processing latency and failure cases
+- Exact model identifier and variant
+- Runtime and version, including the inference settings
+- Python and package versions
+- Hardware and memory requirements
+- Input clip identifier, frame timestamps, and selected frame references
+- Raw model response and parsed result
+- Processing time, failures, and retry behaviour
 
-## Validation plan
+## Evaluation
 
-Use authorized sample clips labeled by human reviewers. Compare predicted labels with ground truth, preserve evidence timestamps, and document false positives, false negatives, uncertain cases, and processing time. Do not claim accuracy or production readiness until measured.
+Use authorized video clips labeled by human reviewers. For each clip, record the expected label, predicted label, evidence timestamps, false positives, false negatives, uncertain cases, and processing time.
 
-## Privacy and safety
+Do not claim accuracy or production readiness until results have been measured and the evaluation method is documented.
 
-- Use only video the operator is authorized to process.
+## Privacy
+
+- Process only footage the operator is authorized to use.
 - Do not perform face recognition or identity profiling.
-- Minimize retained footage and restrict access.
-- Human review is mandatory before action.
+- Minimize stored footage and restrict access to evidence.
+- Treat model output as a hypothesis.
+- Require human review before action.
