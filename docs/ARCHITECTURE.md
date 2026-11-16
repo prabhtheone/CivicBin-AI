@@ -1,89 +1,64 @@
-# CivicBin AI — Architecture Notes
+# Architecture
 
-This document records the intended technical direction for CivicBin AI. It is **design documentation**, not proof that every component has been implemented.
+This document describes the intended design. It does not describe a completed or validated implementation.
 
 ## Goal
 
-Explore an AI-assisted workflow that can help a human reviewer identify possible waste-disposal incidents from authorized CCTV footage.
+Help a human reviewer find and assess possible waste-disposal incidents in authorized video footage.
 
-## Proposed workflow
+## Proposed data flow
 
 ```text
-Authorized video / sample clip
-          |
-          v
-Frame extraction (Python + OpenCV)
-          |
-          v
-Selected frames and context
-          |
-          v
-Gemma 4 multimodal model
-          |
-          v
-Structured candidate incident
-          |
-          v
-Civic Waste Investigator rules / validation
-          |
-          v
-Evidence + confidence + uncertainty
-          |
-          v
-Human review before action
+Authorized video
+      |
+      v
+Frame selection (planned: Python / OpenCV)
+      |
+      v
+Selected frames and timestamps
+      |
+      v
+Vision model (Gemma 4 is the documented direction)
+      |
+      v
+Candidate event description
+      |
+      v
+Civic Waste Investigator review rules
+      |
+      v
+Evidence, uncertainty, and suggested review step
+      |
+      v
+Human decision
 ```
 
-## Proposed incident categories
+## Components and status
 
-- Correct disposal
-- Missed disposal / littering
-- Bin overflow
-- Unclear event requiring human review
-
-The categories must be validated against labeled examples before any performance claims are made.
-
-## Design principles
-
-1. **Evidence first:** an incident report should point to the frames or observations that support it.
-2. **Human oversight:** AI output is a suggestion; a human reviewer makes the final decision.
-3. **Uncertainty is allowed:** unclear or obstructed footage should be marked for review instead of forcing a classification.
-4. **Privacy:** use only footage the project team is authorized to process; avoid face recognition and identity profiling; minimize retained footage.
-5. **Measured performance:** record false positives, false negatives, uncertain cases, and processing time using a labeled test set.
-6. **Keep the first demo small:** validate a single image or short clip before attempting multiple streams or deployment.
-
-## Planned implementation areas
-
-| Area | Intended responsibility | Status in this repository |
+| Component | Intended responsibility | Status in this repository |
 |---|---|---|
-| Video processing | Extract representative frames from a clip | Design direction; source not yet included |
-| Gemma 4 integration | Analyze selected visual input | Model named by project; exact variant/runtime details not yet documented here |
-| Incident structure | Represent candidate event, evidence, confidence, and review status | To be specified alongside implementation |
-| Investigator skill | Apply consistent validation and incident-handling rules | Design direction; skill file not yet included |
-| Dashboard | Let a reviewer inspect candidate incidents | Not documented as implemented here |
-| Evaluation | Compare predictions with labeled examples | Test results not yet included |
-| Deployment | Provide a stable, controlled environment | No deployment link documented here |
+| Video processing | Select frames from a short clip | Planned; no source code included |
+| Vision model | Describe the visual event | Gemma 4 is the documented direction; integration is not included |
+| Incident format | Store event label, evidence, and uncertainty | Example format is in [GEMMA4_WORKFLOW.md](GEMMA4_WORKFLOW.md); no implementation or formal schema |
+| Investigator rules | Check whether the evidence supports a candidate label | Review instructions are documented in [SKILL.md](../skills/civic-waste-investigator/SKILL.md) |
+| Reviewer interface | Let a person inspect evidence and decide what to do | Not implemented or documented as a working interface |
+| Evaluation | Compare outputs with human-labeled events | No dataset or test results included |
+| Deployment | Run the workflow in a controlled environment | No deployment configuration or live demo included |
 
-## Evaluation checklist
+## Design constraints
 
-Before describing the workflow as validated, test it on a small set of labeled clips and document:
+1. **Evidence first:** every proposed label should point to the frames or timestamps that support it.
+2. **Do not guess:** if the event outcome is not visible, use `UNCERTAIN`.
+3. **Human decision:** AI output is a candidate observation, not a verdict.
+4. **Privacy:** use only authorized footage and avoid identity recognition.
+5. **Measured evaluation:** report false positives, false negatives, uncertain cases, and processing time.
 
-- Expected label versus model output
-- Evidence that supports or contradicts the prediction
-- False-positive and false-negative cases
-- Cases routed to human review
-- Processing time and hardware/runtime configuration
+## Implementation work still required
 
-Do not publish invented accuracy numbers or illustrative incident values as real results.
-
-## Hardware and runtime
-
-The exact Gemma 4 variant, inference runtime, Python version, dependency list, and hardware requirements should be recorded only after they have been verified against the working implementation. Do not assume a particular model size or command will work on every machine.
-
-## Next steps
-
-1. Add the actual notebook or source code used during development.
-2. Record the exact model variant and runtime.
-3. Add a small, permission-safe sample input and the corresponding real output.
-4. Implement or document the structured incident schema.
-5. Add tests and report measured results.
-6. Add a demo link only after it is stable and accessible.
+1. Add the actual video-processing and model-integration code.
+2. Record a tested model identifier, runtime version, dependency list, and hardware requirements.
+3. Define and validate the incident data format.
+4. Add permission-safe sample inputs and reproducible expected outputs.
+5. Add tests for frame selection, output parsing, and uncertain cases.
+6. Evaluate against human-labeled clips and publish the test conditions.
+7. Add a reviewer interface only after the core workflow is reproducible.
