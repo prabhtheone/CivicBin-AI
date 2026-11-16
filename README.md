@@ -38,6 +38,16 @@ No accuracy score, deployment, customer adoption, or production readiness is cla
 - [Gemma 4 workflow](docs/GEMMA4_WORKFLOW.md) — proposed model workflow, output example, and evaluation plan.
 - [Civic Waste Investigator skill](skills/civic-waste-investigator/SKILL.md) — evidence-review rules for a human-facing agent.
 
+## Documentation check
+
+Run the repository's documentation checks with Python 3:
+
+```sh
+python3 tests/check_docs.py
+```
+
+The check validates local Markdown links, fenced code blocks, JSON examples, and the Investigator skill front matter. It does not test video processing, model inference, or detection quality.
+
 ## Validation plan
 
 Before relying on incident flags, evaluate the implementation on authorized clips labeled by human reviewers. Record the expected outcome, model output, evidence timestamps, false positives, false negatives, uncertain cases, and processing time.
